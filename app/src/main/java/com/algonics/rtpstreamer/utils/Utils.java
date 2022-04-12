@@ -13,7 +13,7 @@ public class Utils {
     public static  String  congestionport = ":8000/congestion/health/";
     public static long healthpackettimeout = 5 * 1000; // 5 seconds
     public static String emailId ="sourav433@gmail.com";
-    public static final long CongetiontastInterval = 2 * 1000; // 5 seconds;
+    public static final long CongetiontastInterval = 1 * 1000; // 5 seconds;
 
     public static void sendReport(Context context, String header, String msg)
     {
