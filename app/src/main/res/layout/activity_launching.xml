@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".LaunchingActivity">
+
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:padding="5dp"
+        android:orientation="vertical">
+        <Button
+            android:id="@+id/b_camera_demo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:layout_margin="10dp"
+            android:onClick="StartStreamingActivity"
+            android:text="@string/camera_demo_pot"
+            />
+
+        <Button
+            android:id="@+id/b_camera_demo_pot"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:layout_margin="10dp"
+            android:onClick="StartStreamingActivitylandscape"
+            android:text="@string/camera_demo_lan" />
+        <Button
+            android:id="@+id/b_file_transfer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:layout_margin="10dp"
+            android:onClick="StartStreamingFileTransfer"
+            android:text="@string/file_transfer" />
+    </LinearLayout>
+</RelativeLayout>
