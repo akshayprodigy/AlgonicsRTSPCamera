@@ -471,6 +471,62 @@ public class Camera2ApiManager extends CameraDevice.StateCallback {
     }
   }
 
+  public void setShutterSpeed(Long value) {
+    CameraCharacteristics characteristics = getCameraCharacteristics();
+    if (characteristics == null) return;
+    Range<Long> supportedShutterSpeed =
+            characteristics.get(CameraCharacteristics.SENSOR_INFO_EXPOSURE_TIME_RANGE);
+    if (supportedShutterSpeed != null && builderInputSurface != null) {
+      if (value > supportedShutterSpeed.getUpper()) value = supportedShutterSpeed.getUpper();
+      if (value < supportedShutterSpeed.getLower()) value = supportedShutterSpeed.getLower();
+      try {
+        builderInputSurface.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_OFF);
+        builderInputSurface.set(CaptureRequest.SENSOR_EXPOSURE_TIME, value);
+
+      } catch (Exception e) {
+        Log.e(TAG, "Error", e);
+      }
+    }
+  }
+
+  public long getShutterSpeed() {
+    CameraCharacteristics characteristics = getCameraCharacteristics();
+    if (characteristics == null) return 0;
+    if (builderInputSurface != null) {
+      try {
+        return builderInputSurface.get(CaptureRequest.SENSOR_EXPOSURE_TIME);
+      } catch (Exception e) {
+        Log.e(TAG, "Error", e);
+      }
+    }
+    return 0;
+  }
+
+
+
+  public long getMaxShutterSpeed() {
+    CameraCharacteristics characteristics = getCameraCharacteristics();
+    if (characteristics == null) return 0;
+    Range<Long> supportedExposure =
+            characteristics.get(CameraCharacteristics.SENSOR_INFO_EXPOSURE_TIME_RANGE);
+    if (supportedExposure != null) {
+      return supportedExposure.getUpper();
+    }
+    return 0;
+  }
+
+  public long getMinShutterSpeed() {
+    CameraCharacteristics characteristics = getCameraCharacteristics();
+    if (characteristics == null) return 0;
+    Range<Long> supportedExposure =
+            characteristics.get(CameraCharacteristics.SENSOR_INFO_EXPOSURE_TIME_RANGE);
+    if (supportedExposure != null) {
+      return supportedExposure.getLower();
+    }
+    return 0;
+  }
+
+
   public void enableAutoFocus() {
     CameraCharacteristics characteristics = getCameraCharacteristics();
     if (characteristics == null) return;

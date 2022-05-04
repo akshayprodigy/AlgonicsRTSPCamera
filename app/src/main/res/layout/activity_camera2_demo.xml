@@ -64,7 +64,19 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_above="@+id/layoutBottom">
+
+        <SeekBar
+            android:id="@+id/seekBarShutterSpeed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:id="@+id/layoutBottom"
         android:layout_alignParentBottom="true"
         android:layout_margin="10dp"
         android:gravity="center"

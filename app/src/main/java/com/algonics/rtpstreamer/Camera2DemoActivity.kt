@@ -10,6 +10,7 @@ import android.view.SurfaceHolder
 import android.view.View
 import android.view.WindowManager
 import android.widget.*
+import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.appcompat.app.ActionBar
 import com.algonics.encoder.input.video.CameraHelper
 import com.algonics.rtplibrary.util.BitrateAdapter
@@ -39,6 +40,7 @@ class Camera2DemoActivity :baseActivity(), ConnectCheckerRtsp, View.OnClickListe
     private var rtspServerCamera2:RtspServerCamera2? = null
     private var button: Button? = null
     private var bRecord: Button? = null
+    var simpleSeekBar: SeekBar? = null
     private var currentDateAndTime = ""
     private var width = 0
     private var height = 0
@@ -72,8 +74,24 @@ class Camera2DemoActivity :baseActivity(), ConnectCheckerRtsp, View.OnClickListe
         //bRecord = findViewById(R.id.b_record)
         bRecord?.setOnClickListener(this)
         //switch_camera.setOnClickListener(this)
+        simpleSeekBar =  findViewById(R.id.seekBarShutterSpeed)
+
         rtspServerCamera2 = RtspServerCamera2(surfaceViewGL,this,1935)//RtspServerCamera2(this ,true, this, 1935)
         rtspServerCamera2?.setVideoCodec(VideoCodec.H265)
+        simpleSeekBar!!.max = (rtspServerCamera2?.maxShutterSpeed!!.toInt() - rtspServerCamera2?.minShutterSpeed!!.toInt())
+        simpleSeekBar!!.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                var progress = progress
+
+                progress = progress + rtspServerCamera2?.minShutterSpeed!!.toInt()
+                rtspServerCamera2!!.setShutterSpeed(progress.toLong())
+                //Debug.i(TAG, "onProgressChanged 3: $progress")
+                //txtWeeklyPay.setText("$$progress")
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar) {}
+        } )
         surfaceViewGL.holder.addCallback(this)
         //openGlView.holder.addCallback(this)
         // access the items of the list
@@ -239,6 +257,7 @@ class Camera2DemoActivity :baseActivity(), ConnectCheckerRtsp, View.OnClickListe
     null // returns null if camera is unavailable
     }
     }*/
+
 /*
     override fun onNewBitrateRtsp(bitrate: Long) {
         if (bitrateAdapter != null) bitrateAdapter!!.adaptBitrate(bitrate)
@@ -432,7 +451,8 @@ class Camera2DemoActivity :baseActivity(), ConnectCheckerRtsp, View.OnClickListe
             e.printStackTrace()
         }
         url= "http://"+Utils.serverip+ Utils.congestionport;
-        //url = "http://192.168.29.127:8000/congestion/health/"
+        url = "http://192.168.29.127:8000/congestion/health/"
+        Log.e("rtsp","url: "+ url);
         val jsonObjectRequest = JsonObjectRequest(
             Request.Method.POST, url, postData,
             { response ->  Log.d("RTSP","response: "+response) }

@@ -825,6 +825,22 @@ public abstract class Camera2Base implements GetAacData, GetVideoData, GetMicrop
     cameraManager.setExposure(value);
   }
 
+  public void setShutterSpeed(Long value){
+    cameraManager.setShutterSpeed(value);
+  }
+
+  public long getMaxShutterSpeed(){
+    return  cameraManager.getMaxShutterSpeed();
+  }
+
+  public long getMinShutterSpeed(){
+    return  cameraManager.getMinShutterSpeed();
+  }
+
+  public long getCurrentShutterSpeed(){
+    return cameraManager.getShutterSpeed();
+  }
+
   public int getExposure() {
     return cameraManager.getExposure();
   }
