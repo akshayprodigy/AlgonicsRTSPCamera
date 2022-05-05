@@ -12,9 +12,14 @@ public class Utils {
     public static  String  healthport = ":8000/health/";
     public static  String  congestionport = ":8000/congestion/health/";
     public static long healthpackettimeout = 5 * 1000; // 5 seconds
+    public static final long fpsimeout = 1 * 1000;
     public static String emailId ="sourav433@gmail.com";
     public static final long CongetiontastInterval = 1 * 1000; // 5 seconds;
-
+    public static  final int minFps = 1;
+    public static  final int maxFps = 30;
+    public static  final float maxcongetionlimit = 0.7f;
+    public static  final float mincongetionlimit = 0.3f;
+    public static  final int waitperiod = 5;
     public static void sendReport(Context context, String header, String msg)
     {
         Intent i = new Intent(Intent.ACTION_SEND);

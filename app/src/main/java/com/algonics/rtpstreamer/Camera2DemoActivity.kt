@@ -42,12 +42,17 @@ class Camera2DemoActivity :baseActivity(), ConnectCheckerRtsp, View.OnClickListe
     private var bRecord: Button? = null
     var simpleSeekBar: SeekBar? = null
     private var currentDateAndTime = ""
+    var fpsbuffer =0;
     private var width = 0
     private var height = 0
     lateinit var myJob: Job ;
+    lateinit var fpsJob: Job ;
     //val sharedPref: SharedPreferences? = null
     private var fps =60;
+    private var maxfps = 30
+    private var minfps = 1
     lateinit var mainHandler: Handler
+    //lateinit var fpsHandler: Handler
     private var url = "http://serverip:8000/health"
     private var bitrate = 8 * 1000 * 1024;
     lateinit var spinner: Spinner
@@ -289,7 +294,9 @@ class Camera2DemoActivity :baseActivity(), ConnectCheckerRtsp, View.OnClickListe
                 tv_resolution2.text=""
                 if(!Utils.serverip.equals("")){
                     myJob.cancel();
+                    fpsJob.cancel();
                     mainHandler.removeCallbacks(updateTextTask)
+                    //fpsHandler.removeCallbacks((updateFPSTask))
                 }
 
 
@@ -314,7 +321,9 @@ class Camera2DemoActivity :baseActivity(), ConnectCheckerRtsp, View.OnClickListe
             tv_resolution2.text=""
             if(!Utils.serverip.equals("")){
                 myJob.cancel();
+                fpsJob.cancel();
                 mainHandler.removeCallbacks(updateTextTask)
+                //fpsHandler.removeCallbacks((updateFPSTask))
             }
 
         }
@@ -347,8 +356,9 @@ class Camera2DemoActivity :baseActivity(), ConnectCheckerRtsp, View.OnClickListe
                     if(!Utils.serverip.equals("")){
                         mainHandler = Handler(Looper.getMainLooper())
                         mainHandler.post(updateTextTask)
-
+                        //fpsHandler.removeCallbacks((updateFPSTask))
                         myJob = startCongetionSendingJob(Utils.CongetiontastInterval);
+                        fpsJob = startCongetionFPSJob(Utils.fpsimeout)
                     }
 
 
@@ -367,6 +377,7 @@ class Camera2DemoActivity :baseActivity(), ConnectCheckerRtsp, View.OnClickListe
                 tv_resolution2.text = ""
                 if(!Utils.serverip.equals("")){
                     myJob .cancel()
+                    fpsJob.cancel()
                     mainHandler.removeCallbacks(updateTextTask)
                 }
 
@@ -376,6 +387,7 @@ class Camera2DemoActivity :baseActivity(), ConnectCheckerRtsp, View.OnClickListe
 
     override fun surfaceCreated(surfaceHolder: SurfaceHolder) {
     }
+
     override fun surfaceChanged(surfaceHolder: SurfaceHolder, i: Int, i1: Int, i2: Int) {
         rtspServerCamera2!!.startPreview()
     }
@@ -397,6 +409,7 @@ class Camera2DemoActivity :baseActivity(), ConnectCheckerRtsp, View.OnClickListe
             if(!Utils.serverip.equals("")){
                 mainHandler.removeCallbacks(updateTextTask)
                 myJob .cancel()
+                fpsJob.cancel()
             }
 
         }
@@ -413,6 +426,15 @@ class Camera2DemoActivity :baseActivity(), ConnectCheckerRtsp, View.OnClickListe
         }
     }
 
+    private val updateFPSTask = object : Runnable {
+        override fun run() {
+            minusOneSecond()
+            mainHandler.postDelayed(this, Utils.fpsimeout)
+        }
+    }
+
+
+
     // Instantiate the RequestQueue.
 
     @InternalCoroutinesApi
@@ -423,6 +445,36 @@ class Camera2DemoActivity :baseActivity(), ConnectCheckerRtsp, View.OnClickListe
                 sendCongetiondata()
                 delay(timeInterval)
             }
+        }
+    }
+
+    @InternalCoroutinesApi
+    private fun startCongetionFPSJob(timeInterval: Long): Job {
+        return CoroutineScope(Dispatchers.Default).launch {
+            while (NonCancellable.isActive) {
+                // add your task here
+                //sendCongetiondata()
+                adjustFPSData()
+                delay(timeInterval)
+            }
+        }
+    }
+
+    fun adjustFPSData(){
+        val currentsize: Float?= rtspServerCamera2?.hasCongestion()?.congetionDataList?.get(0)?.rtpFrameBlockingQueueCurrentSize
+        val totalsize: Float? = rtspServerCamera2!!.hasCongestion()?.congetionDataList?.get(0)?.rtpFrameBlockingQueueCapacity
+        if (currentsize!! > (totalsize!! * Utils.maxcongetionlimit)){
+            fpsbuffer++
+            if(fpsbuffer> Utils.waitperiod){
+                if((rtspServerCamera2!!.getFPSRate() -2) >= Utils.minFps)
+                    rtspServerCamera2!!.setLimitFPSOnFly(rtspServerCamera2!!.getFPSRate() -2)
+                fpsbuffer =0;
+            }
+        }else if(currentsize!! > (totalsize!! * Utils.mincongetionlimit)){
+            fpsbuffer =0;
+        }else{
+            if((rtspServerCamera2!!.getFPSRate() + 2) >= Utils.maxFps)
+                rtspServerCamera2!!.setLimitFPSOnFly(rtspServerCamera2!!.getFPSRate() +2)
         }
     }
 

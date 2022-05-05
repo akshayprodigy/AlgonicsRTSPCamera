@@ -904,6 +904,10 @@ public abstract class Camera2Base implements GetAacData, GetVideoData, GetMicrop
     videoEncoder.setFps(fps);
   }
 
+  public int getFPSRate(){
+    return videoEncoder.getFps();
+  }
+
   /**
    * Get stream state.
    *
