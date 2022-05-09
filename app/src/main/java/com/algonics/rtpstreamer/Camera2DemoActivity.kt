@@ -83,19 +83,38 @@ class Camera2DemoActivity :baseActivity(), ConnectCheckerRtsp, View.OnClickListe
 
         rtspServerCamera2 = RtspServerCamera2(surfaceViewGL,this,1935)//RtspServerCamera2(this ,true, this, 1935)
         rtspServerCamera2?.setVideoCodec(VideoCodec.H265)
-        simpleSeekBar!!.max = (rtspServerCamera2?.maxShutterSpeed!!.toInt() - rtspServerCamera2?.minShutterSpeed!!.toInt())
+
+        //simpleSeekBar!!.max = (rtspServerCamera2?.maxShutterSpeed!!.toInt() - rtspServerCamera2?.minShutterSpeed!!.toInt())
         simpleSeekBar!!.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                var progress = progress
+                var progressnew = progress
 
-                progress = progress + rtspServerCamera2?.minShutterSpeed!!.toInt()
-                rtspServerCamera2!!.setShutterSpeed(progress.toLong())
+                //progressnew = progress + rtspServerCamera2?.minShutterSpeed!!.toInt()
+                //rtspServerCamera2!!.setShutterSpeed(progressnew.toLong())
                 //Debug.i(TAG, "onProgressChanged 3: $progress")
                 //txtWeeklyPay.setText("$$progress")
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar) {
+
+                val minspeed =rtspServerCamera2!!.minShutterSpeed
+               
+                val maxSpeed = rtspServerCamera2?.maxShutterSpeed
+
+                val diff = maxSpeed?.minus(minspeed!!)
+
+                val perval = diff?.times(simpleSeekBar!!.progress)?.div(100)
+
+                val nextshutterSpeed = perval?.plus(minspeed)
+
+                rtspServerCamera2!!.setShutterSpeed(nextshutterSpeed)
+
+                Toast.makeText(this@Camera2DemoActivity,
+                    "Shutter speed  is: " + nextshutterSpeed,
+                    Toast.LENGTH_SHORT).show()
+
+            }
         } )
         surfaceViewGL.holder.addCallback(this)
         //openGlView.holder.addCallback(this)
@@ -229,11 +248,37 @@ class Camera2DemoActivity :baseActivity(), ConnectCheckerRtsp, View.OnClickListe
 
         Log.i("SelectedSpinner",spinerValue.toString())
         spinner.setSelection(spinerValue)
+        val handler = Handler()
+        handler.postDelayed({ SeekbarSetProgress() }, 500)
+
 
 //        width = 1920
 //        height = 1080
         //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     }
+
+    private fun SeekbarSetProgress() {
+        simpleSeekBar?.setProgress(getCurrentProgress());
+    }
+
+    private fun getCurrentProgress(): Int {
+        val minspeed =rtspServerCamera2!!.minShutterSpeed
+
+        val maxSpeed = rtspServerCamera2?.maxShutterSpeed
+
+        val diff = maxSpeed?.minus(minspeed!!)
+
+        val currentSpeed = rtspServerCamera2?.currentShutterSpeed
+        val curr = currentSpeed?.minus(minspeed)
+        val perval = curr?.div(diff!!)
+        val percentage = perval?.div(100)
+
+        if (percentage != null) {
+            return percentage.toInt()
+        }
+        return 0
+    }
+
 
     override fun onResume() {
         super.onResume()
@@ -442,7 +487,7 @@ class Camera2DemoActivity :baseActivity(), ConnectCheckerRtsp, View.OnClickListe
         return CoroutineScope(Dispatchers.Default).launch {
             while (NonCancellable.isActive) {
                 // add your task here
-                sendCongetiondata()
+                //sendCongetiondata()
                 delay(timeInterval)
             }
         }
@@ -453,8 +498,8 @@ class Camera2DemoActivity :baseActivity(), ConnectCheckerRtsp, View.OnClickListe
         return CoroutineScope(Dispatchers.Default).launch {
             while (NonCancellable.isActive) {
                 // add your task here
-                //sendCongetiondata()
-                adjustFPSData()
+                if(rtspServerCamera2?.hasCongestion()?.congetionDataList?.size!! > 0)
+                    adjustFPSData()
                 delay(timeInterval)
             }
         }
@@ -467,7 +512,7 @@ class Camera2DemoActivity :baseActivity(), ConnectCheckerRtsp, View.OnClickListe
             fpsbuffer++
             if(fpsbuffer> Utils.waitperiod){
                 if((rtspServerCamera2!!.getFPSRate() -2) >= Utils.minFps)
-                    rtspServerCamera2!!.setLimitFPSOnFly(rtspServerCamera2!!.getFPSRate() -2)
+                    //rtspServerCamera2!!.setLimitFPSOnFly(rtspServerCamera2!!.getFPSRate() -2)
                 fpsbuffer =0;
             }
         }else if(currentsize!! > (totalsize!! * Utils.mincongetionlimit)){

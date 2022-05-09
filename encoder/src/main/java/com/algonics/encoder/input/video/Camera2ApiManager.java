@@ -512,6 +512,7 @@ public class Camera2ApiManager extends CameraDevice.StateCallback {
     if (supportedExposure != null) {
       return supportedExposure.getUpper();
     }
+    Log.e("ShutterSpeed","SENSOR_INFO_EXPOSURE_TIME_RANGE not supported");
     return 0;
   }
 
@@ -520,9 +521,12 @@ public class Camera2ApiManager extends CameraDevice.StateCallback {
     if (characteristics == null) return 0;
     Range<Long> supportedExposure =
             characteristics.get(CameraCharacteristics.SENSOR_INFO_EXPOSURE_TIME_RANGE);
+    //Log.e("ShutterSpeed","SENSOR_INFO_EXPOSURE_TIME_RANGE getMinShutterSpeed");
     if (supportedExposure != null) {
+      //Log.e("ShutterSpeed","SENSOR_INFO_EXPOSURE_TIME_RANGE "+supportedExposure.getLower());
       return supportedExposure.getLower();
     }
+    //Log.e("ShutterSpeed","SENSOR_INFO_EXPOSURE_TIME_RANGE not supported");
     return 0;
   }
 

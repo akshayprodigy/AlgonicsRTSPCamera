@@ -834,6 +834,7 @@ public abstract class Camera2Base implements GetAacData, GetVideoData, GetMicrop
   }
 
   public long getMinShutterSpeed(){
+    //Log.e("ShutterSpeed","SENSOR_INFO_EXPOSURE_TIME_RANGE camera2base "+cameraManager.getMinShutterSpeed());
     return  cameraManager.getMinShutterSpeed();
   }
 
